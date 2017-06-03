@@ -62,12 +62,12 @@ addRec(
     pair(zero, [prod('Z', [dot, 'A', #]), prod('A', [dot, a])])
   ],
   [],
-  EdgeList
+  [edge(s(zero), #, s(s(s(zero)))), edge(zero, 'A', s(zero)), edge(zero, a, s(s(zero)))]
 ).
 
 addRec(
   [pair(zero, [
-    prod('Z', [dot, 'A', '#']),
+    prod('Z', [dot, nt('A'), '#']),
     prod('A', [dot, 'a', nt('A'), 'b']),
     prod('A', [dot, 'c'])
   ])],
@@ -77,19 +77,28 @@ addRec(
   ],
   s(zero),
   [pair(zero, [
-    prod('Z', [dot, 'A', '#']),
+    prod('Z', [dot, nt('A'), '#']),
     prod('A', [dot, 'a', nt('A'), 'b']),
     prod('A', [dot, 'c'])
   ])],
   [
     pair(s(s(s(s(s(s(zero)))))), [prod('A', [a, nt('A'), b, dot])]),
     pair(s(s(s(s(s(zero))))), [prod('A', [a, nt('A'), dot, b])]),
-    pair(s(s(s(s(zero)))), [prod('Z', ['A', #, dot])]),
+    pair(s(s(s(s(zero)))), [prod('Z', [nt('A'), #, dot])]),
     pair(s(s(s(zero))), [prod('A', [c, dot])]),
     pair(s(s(zero)), [prod('A', [dot, c]), prod('A', [dot, a, nt('A'), b]), prod('A', [a, dot, nt('A'), b])]),
-    pair(s(zero), [prod('Z', ['A', dot, #])]),
-    pair(zero, [prod('Z', [dot, 'A', #]), prod('A', [dot, a, nt('A'), b]), prod('A', [dot, c])])
+    pair(s(zero), [prod('Z', [nt('A'), dot, #])]),
+    pair(zero, [prod('Z', [dot, nt('A'), #]), prod('A', [dot, a, nt('A'), b]), prod('A', [dot, c])])
   ],
   [],
-  EdgeList
+  [
+    edge(s(s(s(s(s(zero))))), b, s(s(s(s(s(s(zero))))))),
+    edge(s(s(zero)), c, s(s(s(zero)))),
+    edge(s(s(zero)), a, s(s(zero))),
+    edge(s(s(zero)), nt('A'), s(s(s(s(s(zero)))))),
+    edge(s(zero), #, s(s(s(s(zero))))),
+    edge(zero, nt('A'), s(zero)),
+    edge(zero, a, s(s(zero))),
+    edge(zero, c, s(s(s(zero))))
+  ]  
 ).

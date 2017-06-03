@@ -27,8 +27,10 @@ addRec([pair(Label, Closure)|T], ProdList, FreeLabel, StateListStub, StateList, 
   addRec(Rest, ProdList, NextFreeLabel, NewStateListStub, StateList, NewEdgeListStub, EdgeList).
 
 
-%addLinks(Label, NeighbourSymbolLabelPairs, EdgeListStub, NewEdgeListStub).
-addLinks(_, _, _, _).
+% addLinks(+Label, +NeighbourSymbolLabelPairs, +EdgeListStub, -NewEdgeListStub).
+addLinks(_, [], EdgeListStub, EdgeListStub).
+addLinks(Label, [pair(Symbol, LabelDst)|T], EdgeListStub, [edge(Label, Symbol, LabelDst)|ET]) :-
+  addLinks(Label, T, EdgeListStub, ET).
 
 mapSecond([], []).
 mapSecond([pair(_, B)|T], [B|MT]) :- mapSecond(T, MT).
@@ -65,7 +67,7 @@ getNextSymbols([Prod|T], [Symbol|R]) :-
   getNextSymbol(Prod, Symbol),
   getNextSymbols(T, R).
 getNextSymbols([Prod|T], R) :-
-  not(getNextSymbol(Prod, Symbol)),
+  not(getNextSymbol(Prod, _)),
   getNextSymbols(T, R).
 
 uniqueList([], []).
