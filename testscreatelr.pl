@@ -104,7 +104,7 @@ addRec(
 ).
 
 isAccepting([prod('Z', ['a', dot, #])]).
-extractReducing([prod('R', ['a', 'b', 'c', dot])], s(s(s(zero))), 'R').
+extractReducing([prod('R', ['a', 'b', 'c', dot])], s(s(s(zero))), nt('R')).
 
 
 createLR(gramatyka('A', [prod('A', [[a]])]), Auto, Info),
