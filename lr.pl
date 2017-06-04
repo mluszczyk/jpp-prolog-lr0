@@ -9,14 +9,23 @@
 
 createLR(
     gramatyka(Nonterm, NestedProdList), 
-    auto(EdgeList, AcceptingStates, ReducingStates), Info) :-
+    Auto,
+    Info) :-
   flattenProdList(NestedProdList, ProdList),
   closure([prod('Z', [dot, nt(Nonterm), '#'])], ProdList, Closure),
   addRec([pair(zero, Closure)], ProdList, s(zero), [pair(zero, Closure)], StateList, [], EdgeList),
   findAcceptingStates(StateList, AcceptingStates),
   findReducingStates(StateList, ReducingStates),
-  checkAuto(StateList, Info).
+  checkAuto(StateList, Info),
+  setAuto(Info, EdgeList, AcceptingStates, ReducingStates, Auto).
 
+setAuto(yes,
+        EdgeList, AcceptingStates, ReducingStates,
+        auto(EdgeList, AcceptingStates, ReducingStates)).
+
+setAuto(konflikt(_),
+        _, _, _,
+        null).
 
 checkAuto([], yes).
 checkAuto([pair(_, Closure)|T], Res) :-
