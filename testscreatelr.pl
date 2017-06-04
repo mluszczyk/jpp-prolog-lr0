@@ -111,7 +111,7 @@ createLR(gramatyka('A', [prod('A', [[a]])]), Auto, Info),
   accept(Auto, [a]).
 
 createLR(
-    gramatyka('A', [prod('A', [[a], [b, nt('A'), c])]]),
+    gramatyka('A', [prod('A', [[a], [b, nt('A'), c]])]),
     Auto, Info),
   accept(Auto, [b, a, c]).
 
