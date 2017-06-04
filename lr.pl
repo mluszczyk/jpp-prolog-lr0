@@ -46,7 +46,7 @@ setAuto(konflikt(_),
 % Sprawdza konflikty w automacie
 checkAuto([], yes).
 checkAuto([pair(_, Closure)|T], Res) :-
-  not(hasConflict(Closure, _)),
+  \+ (hasConflict(Closure, _)),
   checkAuto(T, Res).
 checkAuto([pair(_, Closure)|_], konflikt(Conflict)) :-
   hasConflict(Closure, Conflict).
@@ -71,7 +71,7 @@ findAcceptingStates([pair(Label, State)|Rest], [Label|ARest]) :-
   isAccepting(State),
   findAcceptingStates(Rest, ARest).
 findAcceptingStates([pair(_, State)|Rest], ARest) :-
-  not(isAccepting(State)),
+  \+ (isAccepting(State)),
   findAcceptingStates(Rest, ARest).
 
 % isAccepting(Closure)
@@ -82,7 +82,7 @@ isAccepting([prod('Z', _, ['#'])|_]).
 % buduje listę stanów redukujących
 findReducingStates([], []).
 findReducingStates([pair(_, Closure)|Rest], FRest) :-
-  not(extractReducing(Closure, _, _)),
+  \+ (extractReducing(Closure, _, _)),
   findReducingStates(Rest, FRest).
 findReducingStates([pair(Label, Closure)|Rest],
                    [triple(Label, N, Item)|FRest]) :-
@@ -136,7 +136,7 @@ getUnaddedClosures([Closure|Rest], StateList, RestUnadded) :-
   closureExists(Closure, StateList, _),
   getUnaddedClosures(Rest, StateList, RestUnadded).
 getUnaddedClosures([Closure|Rest], StateList, [Closure|URest]) :-
-  not(closureExists(Closure, StateList, _)),
+  \+ (closureExists(Closure, StateList, _)),
   getUnaddedClosures(Rest, StateList, URest).
 
 % pobiera z listy stanów etykietę stanu
@@ -172,13 +172,13 @@ getNextSymbols([Prod|T], [Symbol|R]) :-
   getNextSymbol(Prod, Symbol),
   getNextSymbols(T, R).
 getNextSymbols([Prod|T], R) :-
-  not(getNextSymbol(Prod, _)),
+  \+ (getNextSymbol(Prod, _)),
   getNextSymbols(T, R).
 
 % usuwa duplikaty
 uniqueList([], []).
 uniqueList([H|InputTail], [H|UniqueTail]) :-
-  not(member(H, InputTail)),
+  \+ (member(H, InputTail)),
   uniqueList(InputTail, UniqueTail).
 
 uniqueList([H|InputTail], UniqueTail) :-
@@ -196,7 +196,7 @@ mapFollow(Closure, ProdList,
 
 follow(_, [], []).
 follow(Sym, [Prod|TProd], Stub) :-
-  not(applies(Sym, Prod, _)),
+  \+ (applies(Sym, Prod, _)),
   follow(Sym, TProd, Stub).
 follow(Sym, [Prod|TProd], [AProd|Stub]) :-
   applies(Sym, Prod, AProd),
@@ -210,7 +210,7 @@ applies(Sym, prod(Left, Read, [Sym|Rest]), prod(Left, [Sym|Read], Rest)).
 labelClosure(Closure, FreeLabel, StateListStub, Label, FreeLabel) :-
   closureExists(Closure, StateListStub, Label).
 labelClosure(Closure, FreeLabel, StateListStub, FreeLabel, s(FreeLabel)) :-
-  not(closureExists(Closure, StateListStub, _)).
+  \+ (closureExists(Closure, StateListStub, _)).
 
 % sprawdza, czy stan istnieje w liście stanów i zwraca etyketę
 closureExists(Closure, [_|T], Label) :- closureExists(Closure, T, Label).
@@ -238,7 +238,7 @@ getDependencies(Prod, AllProds, DepProds) :-
   dotProds(UndottedProds, DepProds).
 
 getDependencies(Prod, _, []) :-
-  not(getNextSymbol(Prod, _)).
+  \+ (getNextSymbol(Prod, _)).
 
 % filterRepated(A, B, C)
 % różnica zbiorów C = A - B
@@ -247,7 +247,7 @@ filterRepeated([H|T], All, Unrepeated) :-
   member(H, All),
   filterRepeated(T, All, Unrepeated).
 filterRepeated([H|T], All, [H|Unrepeated]) :-
-  not(member(H, All)),
+  \+ (member(H, All)),
   filterRepeated(T, All, Unrepeated).
 
 % zwraca symbol po kropce w produkcji
@@ -260,7 +260,7 @@ prodsForSymbol(nt(Symbol),
                [prod(Symbol, Right)|Found]) :-
   prodsForSymbol(nt(Symbol), T, Found).
 prodsForSymbol(nt(Symbol), [prod(Other, _)|T], Found) :-
-  not(Symbol = Other),
+  \+ (Symbol = Other),
   prodsForSymbol(nt(Symbol), T, Found).
 prodsForSymbol(Symbol, _, []) :- atomic(Symbol).
 
