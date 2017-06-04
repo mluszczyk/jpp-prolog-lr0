@@ -138,3 +138,7 @@ accept(Auto, [f]).
 createLR(
       gramatyka('E', 
       [prod('E', [[nt('E'), f], [f]])]), Auto, Info).
+
+createLR(
+    gramatyka('E', [prod('E', [[f, nt('E')], [f]])]),
+    Auto, Info).

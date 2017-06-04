@@ -9,13 +9,26 @@
 
 createLR(
     gramatyka(Nonterm, NestedProdList), 
-    auto(EdgeList, AcceptingStates, ReducingStates), yes) :-
+    auto(EdgeList, AcceptingStates, ReducingStates), Info) :-
   flattenProdList(NestedProdList, ProdList),
   closure([prod('Z', [dot, nt(Nonterm), '#'])], ProdList, Closure),
   addRec([pair(zero, Closure)], ProdList, s(zero), [pair(zero, Closure)], StateList, [], EdgeList),
   findAcceptingStates(StateList, AcceptingStates),
-  findReducingStates(StateList, ReducingStates).
+  findReducingStates(StateList, ReducingStates),
+  checkAuto(StateList, Info).
 
+
+checkAuto([], yes).
+checkAuto([pair(_, Closure)|T], Res) :-
+  not(hasConflict(Closure, _)),
+  checkAuto(T, Res).
+checkAuto([pair(_, Closure)|_], konflikt(Conflict)) :-
+  hasConflict(Closure, Conflict).
+
+
+hasConflict(Closure, 'more than one production in a state with reducing production') :-
+  extractReducing(Closure, _, _),
+  count(Closure, s(s(_))). % has at least two items
 
 flattenProdList([], []).
 flattenProdList([prod(_, [])|T], TRest) :-
@@ -45,10 +58,13 @@ findReducingStates([pair(Label, Closure)|Rest], [triple(Label, N, Item)|FRest]) 
   extractReducing(Closure, N, Item),
   findReducingStates(Rest, FRest).
 
-extractReducing([prod(Label, List)], N, nt(Label)) :-
+extractReducing([prod(Label, List)|_], N, nt(Label)) :-
   append(Prefix, [dot], List),
   count(Prefix, N).
 
+extractReducing([prod(_, List)|T], TailN, TailLabel) :-
+  not(append(_, [dot], List)),
+  extractReducing(T, TailN, TailLabel).
 
 addRec([], _, _, StateList, StateList, EdgeList, EdgeList).
 addRec([pair(Label, Closure)|T], ProdList, FreeLabel, StateListStub, StateList, EdgeListStub, EdgeList) :-
