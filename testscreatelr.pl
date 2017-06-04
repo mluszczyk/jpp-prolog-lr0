@@ -129,7 +129,12 @@ createLR(
                prod('F', [[f]])]), Auto, Info),
   accept(Auto, [f]).
 
-createLR(                                                                   gramatyka('E',                                                                       [prod('E', [[nt('E'), nt('F')], [nt('F')]]),                                prod('F', [[f]])]), Auto, Info),
+createLR(
+  gramatyka('E',
+             [prod('E', [[nt('E'), nt('F')], [nt('F')]]),
+              prod('F', [[f]])]), Auto, Info),
 accept(Auto, [f]).
 
-createLR(                                                                   gramatyka('E',                                                                       [prod('E', [[nt('E'), f], [f]])]), Auto, Info).
+createLR(
+      gramatyka('E', 
+      [prod('E', [[nt('E'), f], [f]])]), Auto, Info).

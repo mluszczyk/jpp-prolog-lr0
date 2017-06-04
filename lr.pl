@@ -75,9 +75,9 @@ getUnaddedClosures([], _, []).
 getUnaddedClosures([Closure|Rest], StateList, RestUnadded) :-
   closureExists(Closure, StateList, _),
   getUnaddedClosures(Rest, StateList, RestUnadded).
-getUnaddedClosures([Closure|Rest], StateList, [Closure|Rest]) :-
+getUnaddedClosures([Closure|Rest], StateList, [Closure|URest]) :-
   not(closureExists(Closure, StateList, _)),
-  getUnaddedClosures(Rest, StateList, Rest).
+  getUnaddedClosures(Rest, StateList, URest).
 
 getClosuresLabels([], _, []).
 getClosuresLabels([pair(Symbol, Closure)|Rest], StateList, [pair(Symbol, Label)|TRest]) :-
