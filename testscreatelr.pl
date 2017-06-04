@@ -114,3 +114,22 @@ createLR(
     gramatyka('A', [prod('A', [[a], [b, nt('A'), c])]]),
     Auto, Info),
   accept(Auto, [b, a, c]).
+
+createLR(
+		gramatyka('E',
+               [prod('E', [[nt('E'), '+', nt('T')],  [nt('T')]]),
+                prod('T', [[id],  ['(', nt('E'), ')']])   ]),
+		Auto, Info),
+	accept(Auto, [id]).
+
+
+createLR(
+    gramatyka('E',
+              [prod('E', [[nt('F')]]),
+               prod('F', [[f]])]), Auto, Info),
+  accept(Auto, [f]).
+
+createLR(                                                                   gramatyka('E',                                                                       [prod('E', [[nt('E'), nt('F')], [nt('F')]]),                                prod('F', [[f]])]), Auto, Info),
+accept(Auto, [f]).
+
+createLR(                                                                   gramatyka('E',                                                                       [prod('E', [[nt('E'), f], [f]])]), Auto, Info).

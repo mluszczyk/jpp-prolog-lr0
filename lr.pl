@@ -150,7 +150,7 @@ closure(StartWith, ProdList, Closure) :- closureRec(StartWith, ProdList, [], Clo
 closureRec([], _, X, X).
 closureRec([Prod|T], ProdList, Stub, Closure) :-
   getDependencies(Prod, ProdList, DepProds),
-  filterRepeated(DepProds, Stub, PartialMissingProds),
+  filterRepeated(DepProds, [Prod|Stub], PartialMissingProds),
   filterRepeated(PartialMissingProds, T, MissingProds),
   append(T, MissingProds, Rest),
   closureRec(Rest, ProdList, [Prod|Stub], Closure).
@@ -176,8 +176,11 @@ symbolAfterDot([dot, Symbol | _], Symbol).
 symbolAfterDot([_|T], Symbol) :- symbolAfterDot(T, Symbol).
 
 prodsForSymbol(_, [], []).
-prodsForSymbol(nt(Symbol), [prod(Symbol, Right)|T], [prod(Symbol, Right)|Deps]) :-
-  prodsForSymbol(nt(Symbol), T, Deps).
+prodsForSymbol(nt(Symbol), [prod(Symbol, Right)|T], [prod(Symbol, Right)|Found]) :-
+  prodsForSymbol(nt(Symbol), T, Found).
+prodsForSymbol(nt(Symbol), [prod(Other, _)|T], Found) :-
+  not(Symbol = Other),
+  prodsForSymbol(nt(Symbol), T, Found).
 prodsForSymbol(Symbol, _, []) :- atomic(Symbol).
   
 dotProds([], []).
