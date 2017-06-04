@@ -240,7 +240,8 @@ getDependencies(Prod, AllProds, DepProds) :-
 getDependencies(Prod, _, []) :-
   not(getNextSymbol(Prod, _)).
 
-% usuwa duplikaty
+% filterRepated(A, B, C)
+% różnica zbiorów C = A - B
 filterRepeated([], _, []).
 filterRepeated([H|T], All, Unrepeated) :-
   member(H, All),
