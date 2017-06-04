@@ -7,11 +7,47 @@
 
 % createLR(+Gramatyka, -Automat, -Info)
 
-createLR(gramatyka(Nonterm, ProdList), Auto, Info) :-
-  closure([prod('Z', [dot, Nonterm, '#'])], ProdList, Closure),
-  addRec(
-      pair(zero, Closure), ProdList, Auto,
-      s(zero), FullAuto, [], StateList, EdgeList).
+createLR(
+    gramatyka(Nonterm, NestedProdList), 
+    auto(EdgeList, AcceptingStates, ReducingStates), yes) :-
+  flattenProdList(NestedProdList, ProdList),
+  closure([prod('Z', [dot, nt(Nonterm), '#'])], ProdList, Closure),
+  addRec([pair(zero, Closure)], ProdList, s(zero), [pair(zero, Closure)], StateList, [], EdgeList),
+  findAcceptingStates(StateList, AcceptingStates),
+  findReducingStates(StateList, ReducingStates).
+
+
+flattenProdList([], []).
+flattenProdList([prod(_, [])|T], TRest) :-
+  flattenProdList(T, TRest).
+flattenProdList([prod(A, [Right|RRest])|T], [prod(A, Right)|TRest]) :-
+  flattenProdList([prod(A, RRest)|T], TRest).
+
+findAcceptingStates([], []).
+findAcceptingStates([pair(Label, State)|Rest], [Label|ARest]) :-
+  isAccepting(State),
+  findAcceptingStates(Rest, ARest).
+findAcceptingStates([pair(_, State)|Rest], ARest) :-
+  not(isAccepting(State)),
+  findAcceptingStates(Rest, ARest).
+
+% isAccepting(Closure)
+isAccepting([_|T]) :- isAccepting(T).
+isAccepting([prod('Z', List)|_]) :-
+  append(_, [dot, '#'], List).
+
+% findReducingStates
+findReducingStates([], []).
+findReducingStates([pair(_, Closure)|Rest], FRest) :-
+  not(extractReducing(Closure, _, _)),
+  findReducingStates(Rest, FRest).
+findReducingStates([pair(Label, Closure)|Rest], [triple(Label, N, Item)|FRest]) :-
+  extractReducing(Closure, N, Item),
+  findReducingStates(Rest, FRest).
+
+extractReducing([prod(Label, List)], N, nt(Label)) :-
+  append(Prefix, [dot], List),
+  count(Prefix, N).
 
 
 addRec([], _, _, StateList, StateList, EdgeList, EdgeList).
@@ -182,3 +218,6 @@ initial(_, zero).
 
 reduceCountItem(auto(_, _, ReducingList), State, Counter, Item) :-
   member(triple(State, Counter, Item), ReducingList).
+
+count([], zero).
+count([_|T], s(N)) :- count(T, N).
