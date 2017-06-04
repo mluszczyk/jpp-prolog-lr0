@@ -142,3 +142,8 @@ createLR(
 createLR(
     gramatyka('E', [prod('E', [[f, nt('E')], [f]])]),
     Auto, Info).
+
+
+createLR(
+  gramatyka('E', [prod('E', [dot]]))
+  Auto, Info).

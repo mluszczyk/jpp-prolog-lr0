@@ -11,13 +11,18 @@
 % jako zero oraz s(liczba naturalna). Nie używam wbudowanych liczb,
 % dzięki temu mogę korzystać z unifikacji na stukturze liczb.
 
+% W czasie tworzenia automatu, przechowywana jest także lista domknięć
+% zbiorów produkcji z kropkami. Produkcja z kropką jest reprezentowana
+% jako prod(Sym, Read, Unread) - prawa strona w miejscu, w którym
+% zapisalibyśmy kropkę, jest podzielona na dwie listy.
+
 % createLR(+Gramatyka, -Automat, -Info)
 createLR(
     gramatyka(Nonterm, NestedProdList),
     Auto,
     Info) :-
   flattenProdList(NestedProdList, ProdList),
-  closure([prod('Z', [dot, nt(Nonterm), '#'])], ProdList, Closure),
+  closure([prod('Z', [], [nt(Nonterm), '#'])], ProdList, Closure),
   addRec([pair(zero, Closure)],
          ProdList,
          s(zero),
@@ -72,8 +77,7 @@ findAcceptingStates([pair(_, State)|Rest], ARest) :-
 % isAccepting(Closure)
 % sprawdza, czy stan jest akceptujący
 isAccepting([_|T]) :- isAccepting(T).
-isAccepting([prod('Z', List)|_]) :-
-  append(_, [dot, '#'], List).
+isAccepting([prod('Z', _, ['#'])|_]).
 
 % buduje listę stanów redukujących
 findReducingStates([], []).
@@ -87,11 +91,9 @@ findReducingStates([pair(Label, Closure)|Rest],
 
 % Sprawdza, czy stan jest redukujący. Jeśli tak, to
 % ustawia nieterminal i długość produkcji.
-extractReducing([prod(Label, List)|_], N, nt(Label)) :-
-  append(Prefix, [dot], List),
+extractReducing([prod(Label, Prefix, [])|_], N, nt(Label)) :-
   count(Prefix, N).
-extractReducing([prod(_, List)|T], TailN, TailLabel) :-
-  not(append(_, [dot], List)),
+extractReducing([prod(_, _, [_|_])|T], TailN, TailLabel) :-
   extractReducing(T, TailN, TailLabel).
 
 % tworzenie listy stanow i listy przejść
@@ -202,11 +204,7 @@ follow(Sym, [Prod|TProd], [AProd|Stub]) :-
 
 % aplikuje symbol do jednej produkcji
 % sprawdza, czy można go wstawić po kropce, wtedy przesuwa kropkę.
-applies(Sym, prod(Left, Right), prod(Left, ARight)) :-
-  appliesHelper(Sym, Right, ARight).
-appliesHelper(Sym, [H|ProdT], [H|AProdT]) :-
-  appliesHelper(Sym, ProdT, AProdT).
-appliesHelper(Sym, [dot, Sym|Rest], [Sym, dot|Rest]).
+applies(Sym, prod(Left, Read, [Sym|Rest]), prod(Left, [Sym|Read], Rest)).
 
 % zwraca etykietę stanu, dla nowych stanów, pobiera kolejną wolną etykietę
 labelClosure(Closure, FreeLabel, StateListStub, Label, FreeLabel) :-
@@ -252,9 +250,7 @@ filterRepeated([H|T], All, [H|Unrepeated]) :-
   filterRepeated(T, All, Unrepeated).
 
 % zwraca symbol po kropce w produkcji
-getNextSymbol(prod(_, X), Symbol) :- symbolAfterDot(X, Symbol).
-symbolAfterDot([dot, Symbol | _], Symbol).
-symbolAfterDot([_|T], Symbol) :- symbolAfterDot(T, Symbol).
+getNextSymbol(prod(_, _, [Symbol|_]), Symbol).
 
 % zwraca produkcje na podany symbol
 prodsForSymbol(_, [], []).
@@ -272,7 +268,7 @@ dotProds([], []).
 dotProds([H|T], [DH|DT]) :-
   dotProd(H, DH),
   dotProds(T, DT).
-dotProd(prod(Sym, Right), prod(Sym, [dot|Right])).
+dotProd(prod(Sym, Right), prod(Sym, [], Right)).
 
 % accept(+Automat, +Słowo)
 accept(Auto, Word) :-
