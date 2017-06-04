@@ -13,17 +13,17 @@
 
 % createLR(+Gramatyka, -Automat, -Info)
 createLR(
-    gramatyka(Nonterm, NestedProdList), 
+    gramatyka(Nonterm, NestedProdList),
     Auto,
     Info) :-
   flattenProdList(NestedProdList, ProdList),
   closure([prod('Z', [dot, nt(Nonterm), '#'])], ProdList, Closure),
   addRec([pair(zero, Closure)],
          ProdList,
-         s(zero), 
-         [pair(zero, Closure)], 
-         StateList, 
-         [], 
+         s(zero),
+         [pair(zero, Closure)],
+         StateList,
+         [],
          EdgeList),
   findAcceptingStates(StateList, AcceptingStates),
   findReducingStates(StateList, ReducingStates),
@@ -80,7 +80,7 @@ findReducingStates([], []).
 findReducingStates([pair(_, Closure)|Rest], FRest) :-
   not(extractReducing(Closure, _, _)),
   findReducingStates(Rest, FRest).
-findReducingStates([pair(Label, Closure)|Rest], 
+findReducingStates([pair(Label, Closure)|Rest],
                    [triple(Label, N, Item)|FRest]) :-
   extractReducing(Closure, N, Item),
   findReducingStates(Rest, FRest).
@@ -96,31 +96,31 @@ extractReducing([prod(_, List)|T], TailN, TailLabel) :-
 
 % tworzenie listy stanow i listy przejść
 addRec([], _, _, StateList, StateList, EdgeList, EdgeList).
-addRec([pair(Label, Closure)|T], ProdList, FreeLabel, 
+addRec([pair(Label, Closure)|T], ProdList, FreeLabel,
        StateListStub, StateList, EdgeListStub, EdgeList) :-
   getNeighbourClosures(Closure, ProdList, NeighbourSymbolClosurePairs),
   mapSecond(NeighbourSymbolClosurePairs, NeighbourClosures),
   getUnaddedClosures(NeighbourClosures, StateListStub, UnaddedClosures),
-  addClosures(UnaddedClosures, FreeLabel, 
+  addClosures(UnaddedClosures, FreeLabel,
               NextFreeLabel, StateListStub, NewStateListStub,
               UnaddedLabelClosurePairs),
-  getClosuresLabels(NeighbourSymbolClosurePairs, 
+  getClosuresLabels(NeighbourSymbolClosurePairs,
                     NewStateListStub, NeighborSymbolLabelPairs),
   addLinks(Label, NeighborSymbolLabelPairs, EdgeListStub, NewEdgeListStub),
   append(T, UnaddedLabelClosurePairs, Rest), % union set here!
-  addRec(Rest, ProdList, NextFreeLabel, 
+  addRec(Rest, ProdList, NextFreeLabel,
          NewStateListStub, StateList, NewEdgeListStub, EdgeList).
 
 
 % addLinks(+Label,
-%          +NeighbourSymbolLabelPairs, 
-%          +EdgeListStub, 
+%          +NeighbourSymbolLabelPairs,
+%          +EdgeListStub,
 %          -NewEdgeListStub).
 % dodaje przejścia do listy przejść
 addLinks(_, [], EdgeListStub, EdgeListStub).
 addLinks(Label,
          [pair(Symbol, LabelDst)|T],
-         EdgeListStub, 
+         EdgeListStub,
          [edge(Label, Symbol, LabelDst)|ET]) :-
   addLinks(Label, T, EdgeListStub, ET).
 
@@ -140,7 +140,7 @@ getUnaddedClosures([Closure|Rest], StateList, [Closure|URest]) :-
 % pobiera z listy stanów etykietę stanu
 getClosuresLabels([], _, []).
 getClosuresLabels([pair(Symbol, Closure)|Rest],
-                  StateList, 
+                  StateList,
                   [pair(Symbol, Label)|TRest]) :-
   closureExists(Closure, StateList, Label),
   getClosuresLabels(Rest, StateList, TRest).
@@ -153,8 +153,8 @@ addClosures([], FreeLabel, FreeLabel, StateList, StateList, []).
 addClosures([Closure|Rest], FreeLabel, NewFreeLabel, StateList, NewStateList,
     [pair(FreeLabel, Closure)|UnaddedRest]) :-
   addClosures(Rest,
-              s(FreeLabel), 
-              NewFreeLabel, 
+              s(FreeLabel),
+              NewFreeLabel,
               [pair(FreeLabel, Closure)|StateList], NewStateList,
       UnaddedRest).
 
@@ -185,13 +185,13 @@ uniqueList([H|InputTail], UniqueTail) :-
 
 % aplikuje symbol do produkcji w stanie
 mapFollow(_, _, [], []).
-mapFollow(Closure, ProdList, 
+mapFollow(Closure, ProdList,
           [Symbol|TSymbols],
           [pair(Symbol, Followed)|TFollowed]) :-
   follow(Symbol, Closure, FollowedStub),
   closure(FollowedStub, ProdList, Followed),
   mapFollow(Closure, ProdList, TSymbols, TFollowed).
-  
+
 follow(_, [], []).
 follow(Sym, [Prod|TProd], Stub) :-
   not(applies(Sym, Prod, _)),
@@ -218,7 +218,7 @@ labelClosure(Closure, FreeLabel, StateListStub, FreeLabel, s(FreeLabel)) :-
 closureExists(Closure, [_|T], Label) :- closureExists(Closure, T, Label).
 closureExists(ClosureA, [pair(Label, ClosureB)|_], Label) :-
   closuresSame(ClosureA, ClosureB).
-  
+
 closuresSame(ClosureA, ClosureB) :- permutation(ClosureA, ClosureB).
 
 % zwraca domknięcie zbioru produkcji
@@ -258,7 +258,7 @@ symbolAfterDot([_|T], Symbol) :- symbolAfterDot(T, Symbol).
 
 % zwraca produkcje na podany symbol
 prodsForSymbol(_, [], []).
-prodsForSymbol(nt(Symbol), 
+prodsForSymbol(nt(Symbol),
                [prod(Symbol, Right)|T],
                [prod(Symbol, Right)|Found]) :-
   prodsForSymbol(nt(Symbol), T, Found).
@@ -266,7 +266,7 @@ prodsForSymbol(nt(Symbol), [prod(Other, _)|T], Found) :-
   not(Symbol = Other),
   prodsForSymbol(nt(Symbol), T, Found).
 prodsForSymbol(Symbol, _, []) :- atomic(Symbol).
-  
+
 % dodaje kropkę na początku lewej strony produkcji
 dotProds([], []).
 dotProds([H|T], [DH|DT]) :-
