@@ -145,5 +145,5 @@ createLR(
 
 
 createLR(
-  gramatyka('E', [prod('E', [[dot]]]))
+  gramatyka('E', [prod('E', [[dot]])]),
   Auto, Info).
