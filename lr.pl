@@ -16,7 +16,7 @@
 % jako prod(Sym, Read, Unread) - prawa strona w miejscu, w którym
 % zapisalibyśmy kropkę, jest podzielona na dwie listy.
 
-use_module(library(lists)).
+?- use_module(library(lists)).
 
 % createLR(+Gramatyka, -Automat, -Info)
 createLR(
